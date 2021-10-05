@@ -1,12 +1,11 @@
 import datetime
 import subprocess
 import tempfile
-import lzma
 import boto3
 import shutil
 
 from shlex import quote
-from smart_open import open, register_compressor
+from smart_open import open
 
 
 class Archive(object):
@@ -24,10 +23,6 @@ class Archive(object):
         self.access_key_id = access_key_id
         self.secret_access_key = secret_access_key
         self.endpoint_url = s3_endpoint_url
-
-    def _handle_xz(self, file_obj, mode):
-        return lzma.LZMAFile(filename=file_obj, mode=mode,
-                             format=lzma.FORMAT_XZ)
 
     def _get_cmd_path(self, cmd):
         cmd_path = shutil.which(quote(cmd))
@@ -56,17 +51,10 @@ class Archive(object):
                     aws_secret_access_key=self.secret_access_key)
         s3_client = session.client('s3', endpoint_url=self.endpoint_url)
 
-        register_compressor('.xz', self._handle_xz)
-        key = f'{self._get_archive_name()}.sql.xz'
+        key = f'{self._get_archive_name()}.sql.gz'
         s3_uri = f's3://{self.destination_bucket}/{key}'
-        while True:
-            output = process.stdout.readline()
-            if process.poll() is not None:
-                break
-            if output:
-                with tempfile.NamedTemporaryFile() as tmp:
-                    tp = {'writebuffer': tmp, 'client': s3_client}
-                    with open(s3_uri, 'wb', transport_params=tp) as fout:
-                        print(output)
-                        fout.write(output)
-        return process.poll()
+        with tempfile.NamedTemporaryFile() as tmp:
+            tp = {'writebuffer': tmp,
+                  'client': s3_client}
+            with open(s3_uri, 'wb', transport_params=tp) as fout:
+                fout.write(process.stdout.read())
