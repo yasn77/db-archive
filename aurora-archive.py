@@ -43,7 +43,6 @@ def main(aurora_db_type,
     else:
         print("No Aurora type selected")
 
-    print(archiver.get_command())
     process = archiver.call_backup()
     archiver.do_archive(process)
 

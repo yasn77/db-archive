@@ -5,7 +5,8 @@ import boto3
 import shutil
 
 from shlex import quote
-from smart_open import open
+from smart_open import open, register_compressor
+from smart_open.compression import tweak_close
 
 
 class Archive(object):
@@ -36,6 +37,12 @@ class Archive(object):
             tzinfo=datetime.timezone.utc, microsecond=0, second=0).isoformat()
         return(timestamp)
 
+    def _handle_gz(self, file_obj, mode):
+        import gzip
+        result = gzip.GzipFile(fileobj=file_obj, mode=mode, compresslevel=6)
+        tweak_close(result, file_obj)
+        return result
+
     def get_command(self):
         """Override this method for each of the Backup types"""
         pass
@@ -51,10 +58,12 @@ class Archive(object):
                     aws_secret_access_key=self.secret_access_key)
         s3_client = session.client('s3', endpoint_url=self.endpoint_url)
 
+        register_compressor('.gz', self._handle_gz)
         key = f'{self._get_archive_name()}.sql.gz'
         s3_uri = f's3://{self.destination_bucket}/{key}'
         with tempfile.NamedTemporaryFile() as tmp:
             tp = {'writebuffer': tmp,
-                  'client': s3_client}
+                  'client': s3_client,
+                  'buffer_size': '4096'}
             with open(s3_uri, 'wb', transport_params=tp) as fout:
                 fout.write(process.stdout.read())
