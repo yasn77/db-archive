@@ -14,6 +14,7 @@ class Archive(object):
                  source_username,
                  source_password,
                  destination_bucket,
+                 db,
                  access_key_id=None,
                  secret_access_key=None,
                  s3_endpoint_url=None):
@@ -24,6 +25,11 @@ class Archive(object):
         self.access_key_id = access_key_id
         self.secret_access_key = secret_access_key
         self.endpoint_url = s3_endpoint_url
+        if len(db) > 0:
+            self.all_db = False
+            self.db = db
+        else:
+            self.all_db = True
 
     def _get_cmd_path(self, cmd):
         cmd_path = shutil.which(quote(cmd))
@@ -35,7 +41,8 @@ class Archive(object):
     def _get_archive_name(self):
         timestamp = datetime.datetime.utcnow().replace(
             tzinfo=datetime.timezone.utc, microsecond=0, second=0).isoformat()
-        return(timestamp)
+        db_names = 'all' if self.all_db else '+'.join(self.db)
+        return f'{db_names}-{timestamp}'
 
     def _handle_gz(self, file_obj, mode):
         import gzip

@@ -22,6 +22,7 @@ AURORA_DB_TYPES = ['MYSQL', 'PGSQL']
 @click.option('--s3-endpoint-url', prompt=True, prompt_required=False,
               default=None,
               help='S3 Endpoint to use (if you aren\'t using AWS')
+@click.argument('db', nargs=-1)
 def main(aurora_db_type,
          source_host,
          source_username,
@@ -29,7 +30,8 @@ def main(aurora_db_type,
          destination_bucket,
          access_key_id,
          secret_access_key,
-         s3_endpoint_url):
+         s3_endpoint_url,
+         db):
     assert aurora_db_type is not None
 
     if aurora_db_type.lower() == 'mysql':
@@ -37,6 +39,7 @@ def main(aurora_db_type,
                                       source_username,
                                       source_password,
                                       destination_bucket,
+                                      db,
                                       access_key_id=access_key_id,
                                       secret_access_key=secret_access_key,
                                       s3_endpoint_url=s3_endpoint_url)
