@@ -3,10 +3,18 @@ import subprocess
 import tempfile
 import boto3
 import shutil
+import smart_open
+import sys
 
 from shlex import quote
-from smart_open import open, register_compressor
+
 from smart_open.compression import tweak_close
+
+import logging
+
+logging.getLogger('smart_open.s3').addHandler(
+    logging.StreamHandler(stream=sys.stdout))
+logging.getLogger('smart_open.s3').setLevel(logging.INFO)
 
 
 class Archive(object):
@@ -64,13 +72,12 @@ class Archive(object):
                     aws_access_key_id=self.access_key_id,
                     aws_secret_access_key=self.secret_access_key)
         s3_client = session.client('s3', endpoint_url=self.endpoint_url)
-
-        register_compressor('.gz', self._handle_gz)
+        smart_open.register_compressor('.gz', self._handle_gz)
         key = f'{self._get_archive_name()}.sql.gz'
         s3_uri = f's3://{self.destination_bucket}/{key}'
         with tempfile.NamedTemporaryFile() as tmp:
             tp = {'writebuffer': tmp,
                   'client': s3_client,
                   'buffer_size': '4096'}
-            with open(s3_uri, 'wb', transport_params=tp) as fout:
+            with smart_open.open(s3_uri, 'wb', transport_params=tp) as fout:
                 fout.write(process.stdout.read())
