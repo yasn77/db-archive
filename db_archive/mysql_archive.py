@@ -1,6 +1,6 @@
 from shlex import quote
 
-from aurora_archive.archive import Archive
+from db_archive.archive import Archive
 
 
 class MysqlArchive(Archive):

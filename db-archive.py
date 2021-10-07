@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 
 import click
-import aurora_archive.mysql_archive as mysql
+import db_archive.mysql_archive as mysql
 
-AURORA_DB_TYPES = ['MYSQL', 'PGSQL']
+DB_TYPES = ['MYSQL', 'PGSQL']
 
 
 @click.command()
-@click.option('-a', '--aurora-db-type',
-              type=click.Choice(AURORA_DB_TYPES, case_sensitive=False),
-              help=f'Aurora DB Type to use, valid values are \
-                    {AURORA_DB_TYPES} (case insensitive)')
+@click.option('-a', '--db-type',
+              type=click.Choice(DB_TYPES, case_sensitive=False),
+              help=f'DB Type to use, valid values are \
+                    {DB_TYPES} (case insensitive)')
 @click.option('-s', '--source-host', help='Source host')
 @click.option('-u', '--source-username', help='Source username')
 @click.option('-p', '--source-password', help='Source password')
@@ -23,7 +23,7 @@ AURORA_DB_TYPES = ['MYSQL', 'PGSQL']
               default=None,
               help='S3 Endpoint to use (if you aren\'t using AWS')
 @click.argument('db', nargs=-1)
-def main(aurora_db_type,
+def main(db_type,
          source_host,
          source_username,
          source_password,
@@ -32,9 +32,9 @@ def main(aurora_db_type,
          secret_access_key,
          s3_endpoint_url,
          db):
-    assert aurora_db_type is not None
+    assert db_type is not None
 
-    if aurora_db_type.lower() == 'mysql':
+    if db_type.lower() == 'mysql':
         archiver = mysql.MysqlArchive(source_host,
                                       source_username,
                                       source_password,
@@ -44,7 +44,7 @@ def main(aurora_db_type,
                                       secret_access_key=secret_access_key,
                                       s3_endpoint_url=s3_endpoint_url)
     else:
-        print("No Aurora type selected")
+        print("No DB type selected")
 
     process = archiver.call_backup()
     archiver.do_archive(process)
