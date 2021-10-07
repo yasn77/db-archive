@@ -1,0 +1,5 @@
+.direnv
+.vscode
+.env_secrets
+test_database_data/
+dist/
