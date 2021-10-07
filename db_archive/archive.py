@@ -18,7 +18,8 @@ logging.getLogger('smart_open.s3').setLevel(logging.INFO)
 
 
 class Archive(object):
-    def __init__(self, source_host,
+    def __init__(self,
+                 source_host,
                  source_username,
                  source_password,
                  destination_bucket,
@@ -33,6 +34,7 @@ class Archive(object):
         self.access_key_id = access_key_id
         self.secret_access_key = secret_access_key
         self.endpoint_url = s3_endpoint_url
+        self.db_type = self._get_db_type()
         if len(db) > 0:
             self.all_db = False
             self.db = db
@@ -51,6 +53,10 @@ class Archive(object):
             tzinfo=datetime.timezone.utc, microsecond=0, second=0).isoformat()
         db_names = 'all' if self.all_db else '+'.join(self.db)
         return f'{db_names}-{timestamp}'
+
+    def _get_db_type(self):
+        """Override this method for each of the Backup types"""
+        pass
 
     def _handle_gz(self, file_obj, mode):
         import gzip
@@ -74,7 +80,8 @@ class Archive(object):
         s3_client = session.client('s3', endpoint_url=self.endpoint_url)
         smart_open.register_compressor('.gz', self._handle_gz)
         key = f'{self._get_archive_name()}.sql.gz'
-        s3_uri = f's3://{self.destination_bucket}/{key}'
+        s3_uri = f's3://{self.destination_bucket}/'\
+                 f'{self.db_type}/{self.source_host}/{key}'
         with tempfile.NamedTemporaryFile() as tmp:
             tp = {'writebuffer': tmp,
                   'client': s3_client,

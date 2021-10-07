@@ -4,6 +4,9 @@ from db_archive.archive import Archive
 
 
 class MysqlArchive(Archive):
+    def _get_db_type(self):
+        return 'mysql'
+
     def get_command(self):
         mysqldump = self._get_cmd_path('mysqldump')
         db = list()
