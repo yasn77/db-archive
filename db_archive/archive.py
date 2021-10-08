@@ -96,4 +96,3 @@ class Archive(object):
                   'buffer_size': '4096'}
             with smart_open.open(s3_uri, 'wb', transport_params=tp) as fout:
                 fout.write(process.stdout.read())
-
