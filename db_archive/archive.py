@@ -70,8 +70,16 @@ class Archive(object):
 
     def call_backup(self):
         cmd = self.get_command()
-        process = subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE)
-        return process
+        try:
+            process = subprocess.run(cmd,
+                                     shell=False,
+                                     check=True,
+                                     stdout=subprocess.PIPE)
+        except subprocess.CalledProcessError as e:
+            print(f'ERR Backup Failed: Command failed to run - {e}')
+            exit(e.returncode)
+        else:
+            return process
 
     def do_archive(self, process):
         session = boto3.Session(
@@ -88,3 +96,4 @@ class Archive(object):
                   'buffer_size': '4096'}
             with smart_open.open(s3_uri, 'wb', transport_params=tp) as fout:
                 fout.write(process.stdout.read())
+
