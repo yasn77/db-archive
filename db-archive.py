@@ -3,6 +3,7 @@
 import click
 import datetime
 import db_archive.mysql_archive as mysql
+import db_archive.pgsql_archive as pgsql
 
 from db_archive import get_version
 
@@ -17,6 +18,9 @@ ENV_PREFIX = 'DA_'
                     {DB_TYPES} (case insensitive)')
 @click.option('-s', '--source-host', envvar=f'{ENV_PREFIX}SOURCE_HOST',
               help='Source host')
+@click.option('--source-port', prompt=True, prompt_required=False,
+              envvar=f'{ENV_PREFIX}SOURCE_PORT', default=None,
+              help='Source Port')
 @click.option('-u', '--source-username', envvar=f'{ENV_PREFIX}SOURCE_USERNAME',
               help='Source username')
 @click.option('-p', '--source-password', envvar=f'{ENV_PREFIX}SOURCE_PASSWORD',
@@ -37,6 +41,7 @@ ENV_PREFIX = 'DA_'
 @click.argument('db', nargs=-1)
 def main(db_type,
          source_host,
+         source_port,
          source_username,
          source_password,
          destination_bucket,
@@ -61,6 +66,17 @@ def main(db_type,
 
     if db_type.lower() == 'mysql':
         archiver = mysql.MysqlArchive(source_host,
+                                      source_port,
+                                      source_username,
+                                      source_password,
+                                      destination_bucket,
+                                      db,
+                                      access_key_id=access_key_id,
+                                      secret_access_key=secret_access_key,
+                                      s3_endpoint_url=s3_endpoint_url)
+    if db_type.lower() == 'pgsql':
+        archiver = pgsql.PgsqlArchive(source_host,
+                                      source_port,
                                       source_username,
                                       source_password,
                                       destination_bucket,

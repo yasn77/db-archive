@@ -4,6 +4,9 @@ from db_archive.archive import Archive
 
 
 class MysqlArchive(Archive):
+    def _get_default_port(self):
+        return '3306'
+
     def _get_db_type(self):
         return 'mysql'
 

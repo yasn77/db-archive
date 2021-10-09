@@ -20,6 +20,7 @@ logging.getLogger('smart_open.s3').setLevel(logging.INFO)
 class Archive(object):
     def __init__(self,
                  source_host,
+                 source_port,
                  source_username,
                  source_password,
                  destination_bucket,
@@ -28,6 +29,7 @@ class Archive(object):
                  secret_access_key=None,
                  s3_endpoint_url=None):
         self.source_host = source_host
+        self.source_port = source_port
         self.source_username = source_username
         self.source_password = source_password
         self.destination_bucket = destination_bucket
@@ -53,6 +55,14 @@ class Archive(object):
             tzinfo=datetime.timezone.utc, microsecond=0, second=0).isoformat()
         db_names = 'all' if self.all_db else '+'.join(self.db)
         return f'{db_names}-{timestamp}'
+
+    def _get_port(self):
+        return self._get_default_port() if self.source_port is None \
+            else self.source_port
+
+    def _get_default_port(self):
+        """Override this method for each of the Backup types"""
+        pass
 
     def _get_db_type(self):
         """Override this method for each of the Backup types"""
@@ -95,4 +105,4 @@ class Archive(object):
                   'client': s3_client,
                   'buffer_size': '4096'}
             with smart_open.open(s3_uri, 'wb', transport_params=tp) as fout:
-                fout.write(process.stdout.read())
+                fout.write(process.stdout)
