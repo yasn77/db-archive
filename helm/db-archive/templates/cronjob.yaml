@@ -1,15 +1,17 @@
 {{- $dot := . -}}
 
 {{- range .Values.backupJobs }}
+{{- if $.Capabilities.APIVersions.Has "batch/v1/CronJob" }}
 apiVersion: batch/v1
+{{- else }}
+apiVersion: batch/v1beta1
+{{- end }}
 kind: CronJob
 metadata:
   name: {{ include "db-archive.fullname" $dot }}-{{ .name }}
   labels:
     {{- include "db-archive.labels" $dot | nindent 4 }}
     job.{{ $.Chart.Name }}/dbType: {{ .dbType | quote }}
-    job.{{ $.Chart.Name }}/soureHost: {{ .sourceHost | quote }}
-    job.{{ $.Chart.Name }}/destBucket: {{ .bucketName | quote }}
   {{- with $.Values.podAnnotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
