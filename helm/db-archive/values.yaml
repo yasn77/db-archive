@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 
 image:
-  registry: 580824500532.dkr.ecr.eu-central-1.amazonaws.com
+  registry: 020441188643.dkr.ecr.eu-central-1.amazonaws.com
   repository: infrastructure/db-archive
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
