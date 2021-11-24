@@ -38,7 +38,7 @@ ENV_PREFIX = 'DA_'
               help='S3 Endpoint to use (if you aren\'t using AWS')
 @click.version_option(version=get_version(),
                       message='{"version": "%(version)s"}')
-@click.argument('db', nargs=-1)
+@click.argument('db', nargs=-1, required=False)
 def main(db_type,
          source_host,
          source_port,
