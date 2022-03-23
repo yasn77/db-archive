@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  db-archive:
+  - apiVersion: v2
+    appVersion: 0.1.5
+    created: "2022-03-23T13:08:19.858519944Z"
+    description: Create jobs to backup DB to S3
+    digest: 1490709abcf27b12e4b50ce0a3957efcb642167bb04e1055acecb134c3778046
+    name: db-archive
+    type: application
+    urls:
+    - https://github.com/yasn77/db-archive/releases/download/db-archive-0.1.5/db-archive-0.1.5.tgz
+    version: 0.1.5
+generated: "2022-03-23T13:08:19.858525644Z"
