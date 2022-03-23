@@ -1,2 +1,0 @@
-click==8.0.1
-smart_open[s3]==5.2.1
