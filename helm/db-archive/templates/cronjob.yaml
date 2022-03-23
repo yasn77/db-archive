@@ -44,6 +44,7 @@ spec:
                     key: password
               - name: "DA_DESTINATION_BUCKET"
                 value: {{ .bucketName | quote }}
+              {{- toYaml .additionalEnvs | nindent 14}}
             args:
               {{- with .additionalArgs -}}
               {{- toYaml . | nindent 16}}
