@@ -40,8 +40,8 @@ spec:
               - name: "DA_SOURCE_PASSWORD"
                 valueFrom:
                   secretKeyRef:
-                    name: {{ .sourcePasswordSecretName }}
-                    key: password
+                    name: {{ .sourcePasswordSecretName | quote }}
+                    key: {{ .sourcePasswordKey | default "password" | quote }}
               - name: "DA_DESTINATION_BUCKET"
                 value: {{ .bucketName | quote }}
               {{- toYaml .additionalEnvs | nindent 14}}
