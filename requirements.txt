@@ -1,2 +1,2 @@
 click==8.1.7
-smart_open[s3]==7.0.4
+smart_open[s3]==7.0.5
