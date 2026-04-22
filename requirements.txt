@@ -1,2 +1,2 @@
-click==8.3.2
+click==8.3.3
 smart_open[s3]==7.6.0
