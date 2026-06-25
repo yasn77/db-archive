@@ -29,7 +29,7 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@v5
         with:
-          version: v3.21.2
+          version: v4.2.2
 
       - name: Log in to the Container registry
         uses: docker/login-action@3b8fed7e4b60203b2aa0ecc6c6d6d91d12c06760
